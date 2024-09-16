@@ -15,8 +15,8 @@ interface User {
   id: string;
   email: string;
   name: string;
-  lastLogin?: { seconds: number }; // Firestore Timestamp
-  registrationTime?: { seconds: number }; // Firestore Timestamp
+  lastLogin?: { seconds: number };
+  registrationTime?: { seconds: number };
   status: string;
 }
 
@@ -97,64 +97,86 @@ const PrivatePage: React.FC = () => {
   };
 
   return (
-    <div>
-      <p>User Email: {user?.email}</p>
-      <div>
-        <button onClick={handleBlock} className="bg-red-500 text-white p-2">
-          Block
+    <div className="min-h-screen p-8 bg-gray-100 flrx flex-col">
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="flex justify-between items-center mb-6">
+          Admin Dashboard
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+        >
+          Log out
         </button>
-        <button onClick={handleUnblock} className="p-2">
-          Unblock
-        </button>
-        <button onClick={handleDelete} className="p-2">
-          Delete
-        </button>
-      </div>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead>
-          <tr>
-            <th>
-              <input type="checkbox" onChange={handleSelectAll} />
-            </th>
-            <th>ID</th>
-            <th>Email</th>
-            <th>Name</th>
-            <th>Last Login</th>
-            <th>Registration Time</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.has(user.id)}
-                  onChange={() => handleSelect(user.id)}
-                />
-              </td>
+      </header>
 
-              <td>{user.email}</td>
-              <td>{user.name}</td>
-              <td>
-                {user.lastLogin
-                  ? new Date(user.lastLogin.seconds * 1000).toLocaleString()
-                  : "N/A"}
-              </td>
-              <td>
-                {user.registrationTime
-                  ? new Date(
-                      user.registrationTime.seconds * 1000
-                    ).toLocaleString()
-                  : "N/A"}
-              </td>
-              <td>{user.status}</td>
+      <div className="flex flex-col bg-white p-6 rounded-lg shadow-md">
+        <p className="text-lg font-semibold mb-4">User Email: {user?.email}</p>
+        <div className="mb-4 flex space-x-2">
+          <button
+            onClick={handleBlock}
+            className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600 transition"
+          >
+            Block
+          </button>
+          <button
+            onClick={handleUnblock}
+            className="bg-yellow-500 text-white px-4 py-2 rounded shadow hover:bg-yellow-600 transition"
+          >
+            Unblock
+          </button>
+          <button
+            onClick={handleDelete}
+            className="g-red-600 text-black px-4 py-2 rounded shadow hover:bg-red-700 transition"
+          >
+            Delete
+          </button>
+        </div>
+        <table className="min-w-full divide-y divide-gray-300">
+          <thead>
+            <tr className="bg-gray-200 text-gray-600">
+              <th className="p-3 text-left">
+                <input type="checkbox" onChange={handleSelectAll} />
+              </th>
+
+              <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Last Login</th>
+              <th className="p-3 text-left">Registration Time</th>
+              <th className="p-3 text-left">Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <button onClick={handleLogout}>Log out</button>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="p-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(user.id)}
+                    onChange={() => handleSelect(user.id)}
+                  />
+                </td>
+
+                <td className="p-3">{user.email}</td>
+                <td className="p-3">{user.name}</td>
+                <td className="p-3">
+                  {user.lastLogin
+                    ? new Date(user.lastLogin.seconds * 1000).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td>
+                  {user.registrationTime
+                    ? new Date(
+                        user.registrationTime.seconds * 1000
+                      ).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td className="p-3">{user.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

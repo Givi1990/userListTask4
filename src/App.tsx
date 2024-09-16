@@ -6,7 +6,7 @@ import { AuthContextProvider } from "./components/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center bg-slate-500">
       <AuthContextProvider>
         <Routes>
           <Route path="/" element={<LoginForm />} />

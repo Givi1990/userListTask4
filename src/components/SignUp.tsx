@@ -44,40 +44,45 @@ const SignUp: React.FC = () => {
   });
 
   return (
-    <div>
-      <h1>Registration</h1>
-      <form onSubmit={formik.handleSubmit}>
-        <label htmlFor="name">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-        />
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formik.values.email}
-          onChange={formik.handleChange}
-        />
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-        />
-        <button type="submit" className="mr-10">
-          Create Account
-        </button>
-        <button type="button" onClick={() => formik.resetForm({})}>
-          Reset
-        </button>
-      </form>
+    <div className="bg-slate-400 min-h-screen flex items-center justify-center">
+      <div className="bg-white p-8 rounded shadow-lg">
+        <h1 className="text-2xl font-bold mb-6">Registration</h1>
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            className="border p-2 w-full"
+          />
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            className="border p-2 w-full"
+          />
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            className="border p-2 w-full"
+          />
+          <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+            Create Account
+          </button>
+          <button type="button" onClick={() => formik.resetForm({})}>
+            Reset
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
