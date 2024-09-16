@@ -8,6 +8,7 @@ import {
   updateDoc,
   doc,
   deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import { UserAuth } from "./AuthContext";
 
@@ -28,7 +29,11 @@ const PrivatePage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const q = query(collection(db, "users"));
+      const q = query(
+        collection(db, "users"),
+        orderBy("email", "asc"),
+        orderBy("status", "asc")
+      );
       const querySnapshot = await getDocs(q);
       const userList = querySnapshot.docs.map((doc) => {
         const data = doc.data() as Omit<User, "id">;
