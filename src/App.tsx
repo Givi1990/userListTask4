@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import SignUp from "./components/SignUp";
 import PrivatePage from "./components/PrivatePage";
 import { AuthContextProvider } from "./components/AuthContext";

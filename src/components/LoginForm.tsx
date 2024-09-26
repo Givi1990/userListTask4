@@ -35,36 +35,48 @@ const LoginForm: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen gb-slate-400 flex items-center justify-center">
-      <div className="bg-slate-400 flex flex-col items-center justify-center p-8 rounded-lg shadow-lg max-w-md w-full">
-        <p>Login Form</p>
-        <form onSubmit={formik.handleSubmit} className="flex flex-col">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-          />
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-          />
-          {error && <p className="text-red-500">{error}</p>}
-          <div>
-            <button type="submit" className="mr-8">
-              Login
-            </button>
-            <button type="button" onClick={() => navigate("/registration")}>
-              Registration
-            </button>
-          </div>
-        </form>
+    <div className="container min-vh-100 d-flex align-items-center justify-content-center">
+      <div className="card shadow-lg" style={{ width: '20rem' }}>
+        <div className="card-body">
+          <h5 className="card-title text-center">Login Form</h5>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="form-control"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="form-control"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                required
+              />
+            </div>
+            {error && <p className="text-danger">{error}</p>}
+            <div className="d-flex justify-content-between">
+              <button type="submit" className="btn btn-primary">Login</button>
+              <button 
+                type="button" 
+                className="btn btn-outline-secondary" 
+                onClick={() => navigate("/registration")}
+              >
+                Registration
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

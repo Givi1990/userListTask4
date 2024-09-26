@@ -44,44 +44,55 @@ const SignUp: React.FC = () => {
   });
 
   return (
-    <div className="bg-slate-400 min-h-screen flex items-center justify-center">
-      <div className="bg-white p-8 rounded shadow-lg">
-        <h1 className="text-2xl font-bold mb-6">Registration</h1>
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            className="border p-2 w-full"
-          />
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            className="border p-2 w-full"
-          />
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            className="border p-2 w-full"
-          />
-          <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-            Create Account
-          </button>
-          <button type="button" onClick={() => formik.resetForm({})}>
-            Reset
-          </button>
-        </form>
+    <div className="container min-vh-100 d-flex align-items-center justify-content-center">
+      <div className="card shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="card-body">
+          <h5 className="card-title text-center">Registration</h5>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="d-flex justify-content-between">
+              <button type="submit" className="btn btn-primary">Create Account</button>
+              <button type="button" className="btn btn-secondary" onClick={() => formik.resetForm()}>
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
