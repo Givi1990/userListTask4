@@ -5,10 +5,21 @@ import { UserAuth } from "./AuthContext";
 import { db } from "../firebase";
 import { doc, setDoc, getDocs, collection } from "firebase/firestore";
 
+// Определение интерфейса для пользователя
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  registrationTime: Date;
+  status: string;
+  lastLogin: Date;
+}
+
 const SignUp: React.FC = () => {
   const { createUser } = UserAuth();
   const navigate = useNavigate();
-  const [users, setUsers] = useState<any[]>([]); // Состояние для хранения списка пользователей
+  const [users, setUsers] = useState<User[]>([]); // Состояние для хранения списка пользователей
+  const [loading, setLoading] = useState(true); // Состояние для индикатора загрузки
 
   const formik = useFormik({
     initialValues: {
@@ -50,10 +61,15 @@ const SignUp: React.FC = () => {
 
   // Получение списка пользователей из Firestore при загрузке компонента
   const fetchUsers = async () => {
+    setLoading(true); // Устанавливаем индикатор загрузки
     const usersCollection = collection(db, "users");
     const usersSnapshot = await getDocs(usersCollection);
-    const usersList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const usersList = usersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as User[]; // Приведение к типу User
     setUsers(usersList);
+    setLoading(false); // Отключаем индикатор загрузки
   };
 
   useEffect(() => {
@@ -110,7 +126,19 @@ const SignUp: React.FC = () => {
             </div>
           </form>
 
-          
+          {/* Отображение списка пользователей */}
+          <h5 className="mt-4">Список пользователей:</h5>
+          {loading ? (
+            <p>Загрузка пользователей...</p>
+          ) : (
+            <ul className="list-group">
+              {users.map(user => (
+                <li key={user.id} className="list-group-item">
+                  {user.name} ({user.email})
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>
