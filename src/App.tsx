@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import SignUp from "./components/SignUp";
 import PrivatePage from "./components/PrivatePage";
-import { AuthContextProvider } from "./components/AuthContext";
+import { AuthContextProvider } from "./components/AuthContext"; // Это должно быть AuthContextProvider
 import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <div className="flex items-center justify-center bg-slate-500">

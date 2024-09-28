@@ -63,20 +63,35 @@ const PrivatePage: React.FC = () => {
   };
 
   const handleBlock = async () => {
-    for (const id of selectedIds) {
-      await updateDoc(doc(db, "users", id), { status: "blocked" });
+    const allIds = new Set(users.map((user) => user.id));
 
-      // Проверяем, является ли текущий пользователь тем, кого мы блокируем
-      if (id === user?.uid) {
-        await logout();
-        navigate("/");
+    // Если все пользователи отмечены
+    if (selectedIds.size === users.length) {
+      for (const id of allIds) {
+        await updateDoc(doc(db, "users", id), { status: "blocked" });
+        // Логика для логаута, если блокируется сам пользователь
+        if (id === user?.uid) {
+          await handleLogout();
+        }
       }
+      setUsers((prev) =>
+        prev.map((user) => ({ ...user, status: "blocked" }))
+      );
+    } else {
+      // Блокировать только выбранных пользователей
+      for (const id of selectedIds) {
+        await updateDoc(doc(db, "users", id), { status: "blocked" });
+        // Логика для логаута, если блокируется сам пользователь
+        if (id === user?.uid) {
+          await handleLogout();
+        }
+      }
+      setUsers((prev) =>
+        prev.map((user) =>
+          selectedIds.has(user.id) ? { ...user, status: "blocked" } : user
+        )
+      );
     }
-    setUsers((prev) =>
-      prev.map((user) =>
-        selectedIds.has(user.id) ? { ...user, status: "blocked" } : user
-      )
-    );
   };
 
   const handleUnblock = async () => {
@@ -93,11 +108,9 @@ const PrivatePage: React.FC = () => {
   const handleDelete = async () => {
     for (const id of selectedIds) {
       await deleteDoc(doc(db, "users", id));
-
-      // Проверяем, является ли текущий пользователь тем, кого мы удаляем
+      // Логика для логаута, если удаляется сам пользователь
       if (id === user?.uid) {
-        await logout();
-        navigate("/");
+        await handleLogout();
       }
     }
     setUsers((prev) => prev.filter((user) => !selectedIds.has(user.id)));
@@ -107,45 +120,45 @@ const PrivatePage: React.FC = () => {
     try {
       await logout();
       navigate("/");
-      alert("You are logged out");
+      alert("Вы вышли из системы");
     } catch (error) {
-      console.error("Error logging out", error);
+      console.error("Ошибка при выходе:", error);
     }
   };
 
   return (
-    <div className="min-h-screen p-8 bg-light">
+    <div className="min-h-screen p-4 bg-light">
       <header className="d-flex justify-content-between align-items-center mb-4">
         <h1>Admin Dashboard</h1>
         <button onClick={handleLogout} className="btn btn-primary">
-          Log out
+          Выйти
         </button>
       </header>
 
-      <div className="bg-white p-4 rounded shadow">
+      <div className="bg-white p-4 rounded shadow-sm">
         <p className="h5">User Email: {user?.email}</p>
         <div className="mb-4">
           <button onClick={handleBlock} className="btn btn-danger me-2">
-            Block
+            Заблокировать
           </button>
           <button onClick={handleUnblock} className="btn btn-warning me-2">
-            Unblock
+            Разблокировать
           </button>
-          <button onClick={handleDelete} className="btn btn-secondary">
-            Delete
+          <button onClick={handleDelete} className="btn btn-danger">
+            Удалить
           </button>
         </div>
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>
+              <th scope="col">
                 <input type="checkbox" onChange={handleSelectAll} />
               </th>
-              <th>Email</th>
-              <th>Name</th>
-              <th>Last Login</th>
-              <th>Registration Time</th>
-              <th>Status</th>
+              <th scope="col">Email</th>
+              <th scope="col">Name</th>
+              <th scope="col">Последний вход</th>
+              <th scope="col">Время регистрации</th>
+              <th scope="col">Статус</th>
             </tr>
           </thead>
           <tbody>
@@ -167,7 +180,9 @@ const PrivatePage: React.FC = () => {
                 </td>
                 <td>
                   {user.registrationTime
-                    ? new Date(user.registrationTime.seconds * 1000).toLocaleString()
+                    ? new Date(
+                        user.registrationTime.seconds * 1000
+                      ).toLocaleString()
                     : "N/A"}
                 </td>
                 <td>{user.status}</td>

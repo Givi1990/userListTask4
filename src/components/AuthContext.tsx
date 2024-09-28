@@ -1,10 +1,6 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+// src/components/AuthContext.tsx
+
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -13,9 +9,10 @@ import {
   User as FirebaseUser,
   UserCredential,
 } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, updateDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase"; // Путь к вашему firebase.js
+import { doc, updateDoc, serverTimestamp, setDoc, getDoc } from "firebase/firestore";
 
+// Объявляем интерфейс контекста аутентификации
 interface AuthContextProps {
   user: FirebaseUser | null;
   createUser: (email: string, password: string) => Promise<UserCredential>;
@@ -23,59 +20,62 @@ interface AuthContextProps {
   logout: () => Promise<void>;
 }
 
+// Создаем контекст
 const UserContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+// Провайдер контекста
+export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
 
-  const createUser = async (
-    email: string,
-    password: string
-  ): Promise<UserCredential> => {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  // Функция регистрации пользователя
+  const createUser = async (email: string, password: string): Promise<UserCredential> => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const { user } = userCredential;
 
     await setDoc(doc(db, "User_Data", user.uid), {
       registrationTime: serverTimestamp(),
-      lastLogin: serverTimestamp(), // Initial login time
+      lastLogin: serverTimestamp(),
+      status: "active", // Установите статус по умолчанию
     });
     return userCredential;
   };
 
-  const signIn = async (
-    email: string,
-    password: string
-  ): Promise<UserCredential> => {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  // Функция входа пользователя
+  const signIn = async (email: string, password: string): Promise<UserCredential> => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const { user } = userCredential;
 
-    await updateDoc(doc(db, "User_Data", user.uid), {
-      lastLogin: serverTimestamp(),
-    });
+    // Получение документа пользователя из коллекции 'users'
+    const userDoc = await getDoc(doc(db, "users", user.uid)); // Измените на вашу коллекцию
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      console.log("Статус пользователя:", userData?.status); // Логируем статус пользователя
+
+      // Проверка статуса пользователя
+      if (userData?.status === "blocked") {
+        throw new Error("Ваш аккаунт заблокирован."); // Бросаем ошибку, если статус "blocked"
+      }
+
+      // Обновление времени последнего входа
+      await updateDoc(doc(db, "users", user.uid), {
+        lastLogin: serverTimestamp(),
+      });
+    } else {
+      throw new Error("Пользователь не найден в коллекции users.");
+    }
+
     return userCredential;
   };
 
-  const logout = () => {
-    return signOut(auth);
-  };
+  // Функция выхода пользователя
+  const logout = () => signOut(auth);
 
+  // Отслеживание состояния пользователя
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -85,6 +85,7 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+// Хук для использования контекста
 export const UserAuth = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
