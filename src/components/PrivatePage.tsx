@@ -63,9 +63,15 @@ const PrivatePage: React.FC = () => {
   };
 
   const handleBlock = async () => {
-    await Promise.all(
-      Array.from(selectedIds).map((id) => updateDoc(doc(db, "users", id), { status: "blocked" }))
-    );
+    for (const id of selectedIds) {
+      await updateDoc(doc(db, "users", id), { status: "blocked" });
+
+      // Проверяем, является ли текущий пользователь тем, кого мы блокируем
+      if (id === user?.uid) {
+        await logout();
+        navigate("/");
+      }
+    }
     setUsers((prev) =>
       prev.map((user) =>
         selectedIds.has(user.id) ? { ...user, status: "blocked" } : user
@@ -74,9 +80,9 @@ const PrivatePage: React.FC = () => {
   };
 
   const handleUnblock = async () => {
-    await Promise.all(
-      Array.from(selectedIds).map((id) => updateDoc(doc(db, "users", id), { status: "active" }))
-    );
+    for (const id of selectedIds) {
+      await updateDoc(doc(db, "users", id), { status: "active" });
+    }
     setUsers((prev) =>
       prev.map((user) =>
         selectedIds.has(user.id) ? { ...user, status: "active" } : user
@@ -85,9 +91,15 @@ const PrivatePage: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    await Promise.all(
-      Array.from(selectedIds).map((id) => deleteDoc(doc(db, "users", id)))
-    );
+    for (const id of selectedIds) {
+      await deleteDoc(doc(db, "users", id));
+
+      // Проверяем, является ли текущий пользователь тем, кого мы удаляем
+      if (id === user?.uid) {
+        await logout();
+        navigate("/");
+      }
+    }
     setUsers((prev) => prev.filter((user) => !selectedIds.has(user.id)));
   };
 
@@ -95,81 +107,74 @@ const PrivatePage: React.FC = () => {
     try {
       await logout();
       navigate("/");
-      alert("Вы вышли из системы");
+      alert("You are logged out");
     } catch (error) {
-      console.error("Ошибка выхода", error);
+      console.error("Error logging out", error);
     }
   };
 
   return (
-    <div className="container min-vh-100 d-flex align-items-center justify-content-center">
-      <div className="card shadow-lg" style={{ width: '800px' }}>
-        <header className="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-          <h2 className="card-title">Административная панель</h2>
-          <button
-            onClick={handleLogout}
-            className="btn btn-outline-light"
-          >
-            Выйти
+    <div className="min-h-screen p-8 bg-light">
+      <header className="d-flex justify-content-between align-items-center mb-4">
+        <h1>Admin Dashboard</h1>
+        <button onClick={handleLogout} className="btn btn-primary">
+          Log out
+        </button>
+      </header>
+
+      <div className="bg-white p-4 rounded shadow">
+        <p className="h5">User Email: {user?.email}</p>
+        <div className="mb-4">
+          <button onClick={handleBlock} className="btn btn-danger me-2">
+            Block
           </button>
-        </header>
-
-        <div className="card-body">
-          <p className="font-weight-bold">Email пользователя: <span className="text-primary">{user?.email}</span></p>
-          <div className="mb-3">
-            <button
-              onClick={handleBlock}
-              className="btn btn-danger me-2"
-            >
-              Заблокировать
-            </button>
-            <button
-              onClick={handleUnblock}
-              className="btn btn-warning me-2"
-            >
-              Разблокировать
-            </button>
-            <button
-              onClick={handleDelete}
-              className="btn btn-danger"
-            >
-              Удалить
-            </button>
-          </div>
-
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>
+          <button onClick={handleUnblock} className="btn btn-warning me-2">
+            Unblock
+          </button>
+          <button onClick={handleDelete} className="btn btn-secondary">
+            Delete
+          </button>
+        </div>
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" onChange={handleSelectAll} />
+              </th>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Last Login</th>
+              <th>Registration Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>
                   <input
                     type="checkbox"
-                    onChange={handleSelectAll}
-                    checked={selectedIds.size === users.length}
+                    checked={selectedIds.has(user.id)}
+                    onChange={() => handleSelect(user.id)}
                   />
-                </th>
-                <th>Имя</th>
-                <th>Email</th>
-                <th>Статус</th>
+                </td>
+                <td>{user.email}</td>
+                <td>{user.name}</td>
+                <td>
+                  {user.lastLogin
+                    ? new Date(user.lastLogin.seconds * 1000).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td>
+                  {user.registrationTime
+                    ? new Date(user.registrationTime.seconds * 1000).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td>{user.status}</td>
               </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(user.id)}
-                      onChange={() => handleSelect(user.id)}
-                    />
-                  </td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
