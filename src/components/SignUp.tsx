@@ -5,7 +5,7 @@ import { UserAuth } from "./AuthContext";
 import { db } from "../firebase";
 import { doc, setDoc, getDocs, collection } from "firebase/firestore";
 
-// Определение интерфейса для пользователя
+
 interface User {
   id: string;
   name: string;
@@ -49,7 +49,7 @@ const SignUp: React.FC = () => {
     },
   });
 
-  // Функция для обработки ошибок регистрации
+
   const handleRegistrationError = (error: any) => {
     if (error.code === "auth/email-already-in-use") {
       alert("Электронная почта уже используется. Пожалуйста, используйте другую почту.");
@@ -59,7 +59,6 @@ const SignUp: React.FC = () => {
     }
   };
 
-  // Получение списка пользователей из Firestore при загрузке компонента
   const fetchUsers = async () => {
     setLoading(true); // Устанавливаем индикатор загрузки
     const usersCollection = collection(db, "users");
@@ -67,9 +66,9 @@ const SignUp: React.FC = () => {
     const usersList = usersSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-    })) as User[]; // Приведение к типу User
+    })) as User[]; 
     setUsers(usersList);
-    setLoading(false); // Отключаем индикатор загрузки
+    setLoading(false); 
   };
 
   useEffect(() => {
