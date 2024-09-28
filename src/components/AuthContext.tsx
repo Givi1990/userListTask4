@@ -1,4 +1,4 @@
-// src/components/AuthContext.tsx
+
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {
@@ -12,7 +12,7 @@ import {
 import { auth, db } from "../firebase"; // Путь к вашему firebase.js
 import { doc, updateDoc, serverTimestamp, setDoc, getDoc } from "firebase/firestore";
 
-// Объявляем интерфейс контекста аутентификации
+
 interface AuthContextProps {
   user: FirebaseUser | null;
   createUser: (email: string, password: string) => Promise<UserCredential>;
@@ -20,10 +20,10 @@ interface AuthContextProps {
   logout: () => Promise<void>;
 }
 
-// Создаем контекст
+
 const UserContext = createContext<AuthContextProps | undefined>(undefined);
 
-// Провайдер контекста
+
 export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
 
@@ -51,12 +51,12 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ childre
       const userData = userDoc.data();
       console.log("Статус пользователя:", userData?.status); // Логируем статус пользователя
 
-      // Проверка статуса пользователя
+    
       if (userData?.status === "blocked") {
         throw new Error("Ваш аккаунт заблокирован."); // Бросаем ошибку, если статус "blocked"
       }
 
-      // Обновление времени последнего входа
+    
       await updateDoc(doc(db, "users", user.uid), {
         lastLogin: serverTimestamp(),
       });
@@ -67,10 +67,10 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ childre
     return userCredential;
   };
 
-  // Функция выхода пользователя
+
   const logout = () => signOut(auth);
 
-  // Отслеживание состояния пользователя
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -85,7 +85,7 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({ childre
   );
 };
 
-// Хук для использования контекста
+
 export const UserAuth = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
